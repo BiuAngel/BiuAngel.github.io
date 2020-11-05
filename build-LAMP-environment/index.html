@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"poundba.github.io","root":"/","scheme":"Gemini","version":"8.0.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"buttons","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+
+  <meta name="description" content="本教程介绍如何手动在 ECS 实例上搭建LAMP环境（CentOS 8），其中LNMP分别代表Linux、Apache、MySQL 和 PHP。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="部署 LAMP 环境">
+<meta property="og:url" content="https://poundba.github.io/build-LAMP-environment/index.html">
+<meta property="og:site_name" content="白衫故人">
+<meta property="og:description" content="本教程介绍如何手动在 ECS 实例上搭建LAMP环境（CentOS 8），其中LNMP分别代表Linux、Apache、MySQL 和 PHP。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://poundba.github.io/build-LAMP-environment/1.png">
+<meta property="og:image" content="https://poundba.github.io/build-LAMP-environment/2.png">
+<meta property="og:image" content="https://poundba.github.io/build-LAMP-environment/3.png">
+<meta property="og:image" content="https://poundba.github.io/build-LAMP-environment/4.png">
+<meta property="og:image" content="https://poundba.github.io/build-LAMP-environment/5.png">
+<meta property="og:image" content="https://poundba.github.io/build-LAMP-environment/6.png">
+<meta property="og:image" content="https://poundba.github.io/build-LAMP-environment/7.png">
+<meta property="og:image" content="https://poundba.github.io/build-LAMP-environment/8.png">
+<meta property="og:image" content="https://poundba.github.io/build-LAMP-environment/9.png">
+<meta property="og:image" content="https://poundba.github.io/build-LAMP-environment/10.png">
+<meta property="og:image" content="https://poundba.github.io/build-LAMP-environment/11.png">
+<meta property="og:image" content="https://poundba.github.io/build-LAMP-environment/12.png">
+<meta property="og:image" content="https://poundba.github.io/build-LAMP-environment/13.png">
+<meta property="og:image" content="https://poundba.github.io/build-LAMP-environment/14.png">
+<meta property="og:image" content="https://poundba.github.io/build-LAMP-environment/15.png">
+<meta property="article:published_time" content="2020-06-06T16:35:06.000Z">
+<meta property="article:modified_time" content="2020-11-05T11:35:25.202Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="LAMP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://poundba.github.io/build-LAMP-environment/1.png">
+
+
+<link rel="canonical" href="https://poundba.github.io/build-LAMP-environment/">
+
+
+<script data-pjax class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script><script src="/live2d-widget/autoload.js"></script>
+
+  <title>部署 LAMP 环境 | 白衫故人</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="白衫故人" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">白衫故人</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">有朋自远方来，不亦乐乎</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-music">
+
+    <a href="/music/" rel="section"><i class="fa fa-music fa-fw"></i>音乐</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>时间轴</a>
+
+  </li>
+        <li class="menu-item menu-item-schedule">
+
+    <a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a>
+
+  </li>
+        <li class="menu-item menu-item-link">
+
+    <a href="/link/" rel="section"><i class="fa fa-link fa-fw"></i>友人帐</a>
+
+  </li>
+        <li class="menu-item menu-item-guestbook">
+
+    <a href="/guestbook/" rel="section"><i class="fa fa-paper-plane fa-fw"></i>留言板</a>
+
+  </li>
+        <li class="menu-item menu-item-bt">
+
+    <a href="/bt/" rel="section"><i class="fa fa-rocket fa-fw"></i>BT Trackers</a>
+
+  </li>
+        <li class="menu-item menu-item-newpneumonia">
+
+    <a href="https://voice.baidu.com/act/newpneumonia/newpneumonia/?from=osari_pc_3" rel="noopener" target="_blank"><i class="fa fa-medkit fa-fw"></i>新冠疫情</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E6%8F%90%E6%9D%A1%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">前提条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E4%BF%A1%E6%81%AF"><span class="nav-number">2.</span> <span class="nav-text">背景信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E9%99%90%E5%88%B6"><span class="nav-number">3.</span> <span class="nav-text">使用限制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4"><span class="nav-number">4.</span> <span class="nav-text">操作步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83"><span class="nav-number">5.</span> <span class="nav-text">准备编译环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E"><span class="nav-number">5.1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E"><span class="nav-number">5.2.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E"><span class="nav-number">5.3.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E"><span class="nav-number">5.4.</span> <span class="nav-text">说明</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-Apache"><span class="nav-number">6.</span> <span class="nav-text">安装 Apache</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E"><span class="nav-number">6.1.</span> <span class="nav-text">说明</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-MySQL"><span class="nav-number">7.</span> <span class="nav-text">安装 MySQL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E"><span class="nav-number">7.1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">7.2.</span> <span class="nav-text">注意</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-PHP"><span class="nav-number">8.</span> <span class="nav-text">安装 PHP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E"><span class="nav-number">8.1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E"><span class="nav-number">8.2.</span> <span class="nav-text">说明</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-phpMyAdmin"><span class="nav-number">9.</span> <span class="nav-text">安装 phpMyAdmin</span></a></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Dawn"
+      src="/images/cat.jpg">
+  <p class="site-author-name" itemprop="name">Dawn</p>
+  <div class="site-description" itemprop="description">以梦为马，不负韶华</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="sidebar-button animated"><i class="fa fa-comment"></i>
+    Chat
+  </a>
+  </div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Poundba" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Poundba" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhanjizhuang@gmail.com" title="E-Mail → mailto:zhanjizhuang@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </section>
+        <div class="back-to-top animated">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Poundba" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://poundba.github.io/build-LAMP-environment/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/cat.jpg">
+      <meta itemprop="name" content="Dawn">
+      <meta itemprop="description" content="以梦为马，不负韶华">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="白衫故人">
+    </span>
+
+    
+    
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          部署 LAMP 环境
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-06-07 00:35:06" itemprop="dateCreated datePublished" datetime="2020-06-07T00:35:06+08:00">2020-06-07</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-11-05 19:35:25" itemprop="dateModified" datetime="2020-11-05T19:35:25+08:00">2020-11-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%BB%BA%E7%AB%99/" itemprop="url" rel="index"><span itemprop="name">建站</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">评论：</span>
+    
+    <a title="valine" href="/build-LAMP-environment/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/build-LAMP-environment/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+      </div>
+      <div class="post-meta">
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>8.1k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>7 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>本教程介绍如何手动在 ECS 实例上搭建LAMP环境（CentOS 8），其中LNMP分别代表Linux、Apache、MySQL 和 PHP。</p>
+<a id="more"></a>
+
+<h2 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h2><p>使用本教程进行操作前，请确保您已经注册了阿里云账号。如还未注册，请先完成 <a target="_blank" rel="noopener" href="https://account.aliyun.com/register/register.htm">账号注册</a>。</p>
+<h2 id="背景信息"><a href="#背景信息" class="headerlink" title="背景信息"></a>背景信息</h2><p>本篇教程在示例步骤中使用了以下配置的 ECS 实例：</p>
+<ul>
+<li>实例规格：ecs.c6.large</li>
+<li>操作系统：CentOS 7.2 64位</li>
+<li>专有网络</li>
+<li>公网IP</li>
+</ul>
+<h2 id="使用限制"><a href="#使用限制" class="headerlink" title="使用限制"></a>使用限制</h2><p>本篇教程在示例步骤中使用了以下版本的软件。操作时，请您以实际软件版本为准。</p>
+<ul>
+<li>Apache：2.4.43</li>
+<li>MySQL：5.6.24</li>
+<li>PHP：7.0.32</li>
+<li>phpMyAdmin：4.0.10.20</li>
+</ul>
+<p>本篇教程适用于熟悉Linux操作系统，初次使用阿里云进行建站的个人用户。</p>
+<p>本篇教程主要说明手动安装 LAMP 平台的操作步骤，您也可以在 <a target="_blank" rel="noopener" href="https://market.aliyun.com/software">云市场</a> 购买 LAMP 镜像直接启动 ECS，以便快速建站。</p>
+<h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><p>使用云服务器 ECS 搭建 LAMP 平台的操作步骤如下：</p>
+<ol>
+<li>准备编译环境</li>
+<li>安装 Apache</li>
+<li>安装 MySQL</li>
+<li>安装 PHP</li>
+<li>安装 phpMyAdmin</li>
+</ol>
+<h2 id="准备编译环境"><a href="#准备编译环境" class="headerlink" title="准备编译环境"></a>准备编译环境</h2><ol>
+<li><p>运行命令 <code>cat /etc/redhat-release</code> 查看系统版本。</p>
+<p><img src="1.png"></p>
+</li>
+<li><p>关闭防火墙。</p>
+<ol>
+<li><p>运行命令 <code>systemctl status firewalld</code> 查看当前防火墙的状态。</p>
+<p><img src="2.png"></p>
+<ul>
+<li>如果防火墙的状态参数是 inactive，则防火墙为关闭状态。</li>
+<li>如果防火墙的状态参数是 active，则防火墙为开启状态。本示例在防火墙为开启状态，因此需要关闭防火墙。</li>
+</ul>
+</li>
+<li><p>关闭防火墙。如果防火墙为关闭状态，请忽略此步骤。</p>
+<ul>
+<li><p>如果您想临时关闭防火墙，运行命令 <code>systemctl stop firewalld</code>。</p>
+<div class="note info"><h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p>这只是暂时关闭防火墙，下次重启 Linux 后，防火墙还会开启。</p>
+</div>
+</li>
+<li><p>如果您想永久关闭防火墙，运行命令 <code>systemctl disable firewalld</code>。</p>
+<div class="note info"><h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p>如果您想重新开启防火墙，请参见 <a target="_blank" rel="noopener" href="https://firewalld.org/">firewalld官网信息</a>。</p>
+</div>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p>关闭 SELinux。</p>
+<ol>
+<li><p>运行命令 <code>getenforce</code> 命令查看 SELinux，运行命令 <code>setenforce 0</code>。</p>
+<p><img src="3.png"></p>
+<ul>
+<li>如果 SELinux 状态参数是 Disabled，则 SELinux 为关闭状态。</li>
+<li>如果 SELinux 状态参数是 Enforcing，则 SELinux 为开启状态。本示例中 SELinux 为开启状态，因此需要关闭 SELinux。</li>
+</ul>
+</li>
+<li><p>关闭 SELinux。如果 SELinux 为关闭状态，请忽略此步骤。</p>
+<ul>
+<li><p>如果您想临时关闭 SELinux，运行命令 <code>setenforce 0</code>。</p>
+<div class="note info"><h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p>这只是暂时关闭SELinux，下次重启Linux后，SELinux还会开启。</p>
+</div>
+</li>
+<li><p>如果您想永久关闭 SELinux，运行命令 <code>vi /etc/selinux/config</code> 编辑 SELinux 配置文件。回车后，把光标移动到 <em>SELINUX=enforcing</em> 这一行，按 <code>i</code> 键，将其修改为 <em>SELINUX=disabled</em>，按 <code>Esc</code> 键，然后输入 <code>:wq</code> 并回车以保存并关闭 SELinux 配置文件。</p>
+<div class="note info"><h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p>如果您想重新开启SELinux，请参见 <a target="_blank" rel="noopener" href="https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/deployment_guide/ch-selinux#s1-SELinux-resources">SELinux的官方文档</a>。</p>
+</div>
+</li>
+</ul>
+</li>
+<li><p>重启系统使设置生效。</p>
+</li>
+</ol>
+</li>
+</ol>
+<h2 id="安装-Apache"><a href="#安装-Apache" class="headerlink" title="安装 Apache"></a>安装 Apache</h2><ol>
+<li><p>依次运行以下命令安装依赖包。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum groupinstall &quot;Development Tools&quot; -y</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install libtool -y</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install expat-devel pcre pcre-devel openssl-devel -y</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>依次运行以下命令下载并解压 Apache、Apr 和 Apr-util 的源码包。</p>
+<div class="note info"><h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p>源码包版本会不断升级。您可以从 <a target="_blank" rel="noopener" href="https://mirrors.aliyun.com/apache/httpd/">httpd源码安装包</a> 和 <a target="_blank" rel="noopener" href="https://mirrors.aliyun.com/apache/apr/">apr源码安装包</a> 页面查看可用的源码包版本，并将命令中的源码包版本替换为待安装的版本。</p>
+</div>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://mirrors.aliyun.com/apache/httpd/httpd-&lt;Apache源码包版本&gt;.tar.gz</span><br></pre></td></tr></table></figure>
+
+<p>本示例步骤中，使用的 Apache 源码安装包版本为 2.4.43，因此下载命令为：</p>
+<p><code>wget https://mirrors.aliyun.com/apache/httpd/httpd-2.4.43.tar.gz</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://mirrors.aliyun.com/apache/apr/apr-&lt;Apr源码包版本&gt;.tar.gz</span><br></pre></td></tr></table></figure>
+
+<p>本示例步骤中，使用的 Apr 源码安装包版本为 1.6.5，因此下载命令为：</p>
+<p><code>wget https://mirrors.aliyun.com/apache/apr/apr-1.6.5.tar.gz</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://mirrors.aliyun.com/apache/apr/apr-util-&lt;Apr-util源码包版本&gt;.tar.gz</span><br></pre></td></tr></table></figure>
+
+<p>本示例步骤中，使用的 Apr-util 源码安装包版本为 1.6.1，因此下载命令为：</p>
+<p><code>wget https://mirrors.aliyun.com/apache/apr/apr-util-1.6.1.tar.gz</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar xvf httpd-&lt;Apache源码包版本&gt;.tar.gz -C /usr/local/src</span><br></pre></td></tr></table></figure>
+
+<p>本示例步骤中，使用的 Apache 源码安装包版本为 2.4.43，因此解压命令为：</p>
+<p><code>tar xvf httpd-2.4.43.tar.gz -C /usr/local/src</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar xvf apr-&lt;Apr源码包版本&gt;.tar.gz -C /usr/local/src</span><br></pre></td></tr></table></figure>
+
+<p>本示例步骤中，使用的 Apr 源码安装包版本为 1.6.5，因此解压命令为：</p>
+<p><code>tar xvf apr-1.6.5.tar.gz -C /usr/local/src</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar xvf apr-util-&lt;Apr-util源码包版本&gt;.tar.gz -C /usr/local/src</span><br></pre></td></tr></table></figure>
+
+<p>本示例步骤中，使用的 Apr-util 源码安装包版本为 1.6.1，因此解压命令为：</p>
+<p><code>tar xvf apr-util-1.6.1.tar.gz -C /usr/local/src</code></p>
+</li>
+<li><p>依次运行以下命令把 Apr 和 Apr-util 的文件夹移到 Apache 的 srclib 文件夹下。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/src</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mv apr-&lt;apr源码包版本&gt; httpd-&lt;Apache源码包版本&gt;/srclib/apr</span><br></pre></td></tr></table></figure>
+
+<p>本示例步骤中，使用的 Apr 和 Apache 源码安装包版本分别为 1.6.5 和 2.4.43，因此移动文件夹的命令为：</p>
+<p><code>mv apr-1.6.5 httpd-2.4.43/srclib/apr</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mv apr-util-&lt;Apr-util源码包版本&gt; httpd-&lt;Apache源码包版本&gt;/srclib/apr-util</span><br></pre></td></tr></table></figure>
+
+<p>本示例步骤中，使用的 Apr-util 和 Apache 源码安装包版本分别为 1.6.1 和 2.4.43，因此移动文件夹的命令为：</p>
+<p><code>mv apr-util-1.6.1 httpd-2.4.43/srclib/apr-util</code></p>
+</li>
+<li><p>依次运行以下命令编译源码。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/src/httpd-&lt;源码包版本&gt;</span><br></pre></td></tr></table></figure>
+
+<p>本示例步骤中，使用的Apache源码包版本为2.4.43，因此进入Apache源码所在目录的命令为：</p>
+<p><code>cd /usr/local/src/httpd-2.4.43</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./buildconf</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">./configure --prefix=/usr/local/apache2 \</span><br><span class="line">--enable-ssl \</span><br><span class="line">--enable-so \</span><br><span class="line">--with-mpm=event \</span><br><span class="line">--with-included-apr \</span><br><span class="line">--enable-cgi \</span><br><span class="line">--enable-rewrite \</span><br><span class="line">--enable-mods-shared=most \</span><br><span class="line">--enable-mpms-shared=all</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>依次运行以下命令设置 PATH 环境变量。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;export PATH=$PATH:/usr/local/apache2/bin&quot; &gt; /etc/profile.d/httpd.sh</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source /etc/profile.d/httpd.sh</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行 <code>httpd -v</code> 命令查看 Apache 的版本号。</p>
+<p><img src="4.png"></p>
+</li>
+<li><p>添加 Apache 的启动配置文件。</p>
+<ol>
+<li><p>运行命令 <code>vi /usr/lib/systemd/system/httpd.service</code>，打开 Apache 的启动配置文件。</p>
+</li>
+<li><p>按下 <code>i</code> 键然后在配置文件中写入如下内容。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[Unit] </span><br><span class="line">Description=The Apache HTTP Server </span><br><span class="line">After=network.target </span><br><span class="line"></span><br><span class="line">[Service] </span><br><span class="line">Type=forking </span><br><span class="line">ExecStart=/usr/<span class="built_in">local</span>/apache2/bin/apachectl -k start </span><br><span class="line">ExecReload=/usr/<span class="built_in">local</span>/apache2/bin/apachectl -k graceful </span><br><span class="line">ExecStop=/usr/<span class="built_in">local</span>/apache2/bin/apachectl -k graceful-stop </span><br><span class="line">PIDFile=/usr/<span class="built_in">local</span>/apache2/logs/httpd.pid </span><br><span class="line">PrivateTmp=<span class="literal">false</span></span><br><span class="line"></span><br><span class="line">[Install] </span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>按下 <code>Esc</code> 键，然后输入 <code>:wq</code> 并回车以保存并关闭 Apache 启动配置文件。</p>
+</li>
+</ol>
+</li>
+<li><p>依次运行以下命令启动 Apache 服务并设置服务开机自启动。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl start httpd</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl enable httpd</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看安装结果。</p>
+<p>在本地机器的浏览器地址栏中，输入 <code>http://IP地址</code> 并按 <code>Enter</code> 键。若返回页面如下图所示，说明 Apache 服务启动成功。</p>
+<p><img src="5.png"></p>
+</li>
+</ol>
+<h2 id="安装-MySQL"><a href="#安装-MySQL" class="headerlink" title="安装 MySQL"></a>安装 MySQL</h2><ol>
+<li><p>准备 MySQL 的编译环境和工作目录。</p>
+<ol>
+<li><p>依次运行以下命令准备编译环境。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install ncurses-devel bison gnutls-devel -y</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install cmake -y</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>依次运行以下命令准备 MySQL 数据存放目录，并添加用户和用户组。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir /mnt/data</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">groupadd -r mysql</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -r -g mysql -s /sbin/nologin mysql</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">id mysql</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行以下命令更改数据目录属主和属组。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chown -R mysql:mysql /mnt/data</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><p>依次运行以下命令下载稳定版源码包并解压、编译。</p>
+<div class="note info"><h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p>如果 MySQL 官方的下载链接异常，建议您通过第三方链接下载 MySQL 源码包，或者您也可以通过 MySQL 官网或第三方途径下载 MySQL 源码包，然后使用远程连接工具（例如PuTTY）将源码包上传至服务器。</p>
+</div>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://dev.mysql.com/get/Downloads/mysql-5.6.24.tar.gz</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar xvf mysql-5.6.24.tar.gz -C  /usr/local/src</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/src/mysql-5.6.24</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \</span><br><span class="line">-DMYSQL_DATADIR=/mnt/data \</span><br><span class="line">-DSYSCONFDIR=/etc \</span><br><span class="line">-DWITH_INNOBASE_STORAGE_ENGINE=1 \</span><br><span class="line">-DWITH_ARCHIVE_STORAGE_ENGINE=1 \</span><br><span class="line">-DWITH_BLACKHOLE_STORAGE_ENGINE=1 \</span><br><span class="line">-DWITH_READLINE=1 \</span><br><span class="line">-DWITH_SSL=system \</span><br><span class="line">-DWITH_ZLIB=system \</span><br><span class="line">-DWITH_LIBWRAP=0 \</span><br><span class="line">-DMYSQL_TCP_PORT=3306 \</span><br><span class="line">-DDEFAULT_CHARSET=utf8 \</span><br><span class="line">-DMYSQL_UNIX_ADDR=/usr/local/mysql/mysql.sock \</span><br><span class="line">-DDEFAULT_COLLATION=utf8_general_ci \</span><br><span class="line">-DWITH_SYSTEMD=1 \</span><br><span class="line">-DINSTALL_SYSTEMD_UNITDIR=/usr/lib/systemd/system </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置 MySQL。</p>
+<ol>
+<li><p>运行以下命令修改安装目录的属组为 mysql。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chown -R mysql:mysql /usr/local/mysql/</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>依次运行以下命令初始化数据库并复制配置文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/mysql</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/mysql/scripts/mysql_install_db --user=mysql --datadir=/mnt/data/</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mv /etc/my.cnf /etc/my.cnf.bak</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp /usr/local/mysql/support-files/my-default.cnf /etc/my.cnf</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行以下命令修改配置文件中的安装路径及数据目录存放路径。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo -e &quot;basedir = /usr/local/mysql\ndatadir = /mnt/data\n&quot; &gt;&gt; /etc/my.cnf</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改 MySQL 的启动配置文件。</p>
+<ol>
+<li><p>运行命令 <code>vi /usr/lib/systemd/system/mysql.service</code> 打开 MySQL 的启动配置文件。</p>
+</li>
+<li><p>按下 <code>i</code> 键，然后添加如下内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=MySQL Community Server</span><br><span class="line">After=network.target</span><br><span class="line">After=syslog.target</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">Alias=mysql.service</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">User=mysql</span><br><span class="line">Group=mysql</span><br><span class="line">PermissionsStartOnly=<span class="literal">true</span></span><br><span class="line">ExecStart=/usr/<span class="built_in">local</span>/mysql/bin/mysqld</span><br><span class="line">TimeoutSec=600</span><br><span class="line">Restart=always</span><br><span class="line">PrivateTmp=<span class="literal">false</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>按下 <code>Esc</code> 键，然后输入 <code>:wq</code> 并回车以保存并关闭 MySQL 启动配置文件。</p>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>依次运行以下命令设置 PATH 环境变量。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;export PATH=$PATH:/usr/local/mysql/bin&quot; &gt; /etc/profile.d/mysql.sh</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source /etc/profile.d/mysql.sh</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>依次运行以下命令启动 MySQL 服务并设置开机启动。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl start mysql</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl enable mysql</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改 MySQL 的 root 用户密码，并按提示设置密码。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqladmin -u root password</span><br></pre></td></tr></table></figure>
+
+<div class="note danger"><h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>如果连接时出现 <strong>mysqql.sock</strong> 相关报错，可能的原因如下：</p>
+<ul>
+<li>mysql 服务未正常运行。您可以运行命令 <code>service mysqld status</code> 判断服务是否运行。</li>
+<li>mysql.sock 文件路径配置有误。您需要在 /etc/my.cnf 文件内，修改 socket 参数的配置路径与 mysql.sock 文件实际路径一致，并重启 mysql 服务。</li>
+</ul>
+</div>
+</li>
+<li><p>运行以下命令测试登录 MySQL 数据库。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -uroot -p</span><br></pre></td></tr></table></figure>
+
+<p><img src="6.png"></p>
+</li>
+<li><p>运行 <code>\q</code> 命令退出 MySQL。</p>
+</li>
+</ol>
+<h2 id="安装-PHP"><a href="#安装-PHP" class="headerlink" title="安装 PHP"></a>安装 PHP</h2><ol>
+<li><p>运行以下命令安装依赖包。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install libmcrypt libmcrypt-devel mhash mhash-devel libxml2 libxml2-devel bzip2 bzip2-devel -y</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>依次运行以下命令下载稳定版源码包并解压、编译。</p>
+<div class="note info"><h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p>下载 PHP 稳定版源码包需要良好的网络环境。如果下载失败，请先运行命令 <code>cd</code>，然后运行命令 <code>rm -rf mirror</code> 后，重新下载 PHP 稳定版源码包。</p>
+</div>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://cn2.php.net/get/php-7.0.32.tar.bz2/from/this/mirror</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp mirror php-7.0.32.tar.bz2</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar xvf php-7.0.32.tar.bz2 -C /usr/local/src</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/src/php-7.0.32</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">./configure --prefix=/usr/local/php \</span><br><span class="line">--with-config-file-scan-dir=/etc/php.d \</span><br><span class="line">--with-apxs2=/usr/local/apache2/bin/apxs \</span><br><span class="line">--with-config-file-path=/etc \</span><br><span class="line">--with-pdo-mysql=mysqlnd \</span><br><span class="line">--with-mysqli=/usr/local/mysql/bin/mysql_config \</span><br><span class="line">--enable-mbstring \</span><br><span class="line">--with-freetype-dir \</span><br><span class="line">--with-jpeg-dir \</span><br><span class="line">--with-png-dir \</span><br><span class="line">--with-zlib \</span><br><span class="line">--with-libxml-dir=/usr \</span><br><span class="line">--with-openssl \</span><br><span class="line">--enable-xml \</span><br><span class="line">--enable-sockets \</span><br><span class="line">--enable-fpm \</span><br><span class="line">--with-bz2</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<div class="note info"><h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p>若 ECS 实例规格内存较小，配置时可关闭不需要的 PHP 扩展，节省内存。例如，在 <strong>./configure</strong> 命令中添加 <strong>–disable-fileinfo</strong> 选项，关闭 fileinfo 扩展。</p>
+</div>
+</li>
+<li><p>运行以下命令复制 PHP 的配置文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp php.ini-production /etc/php.ini</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行命令 <code>vi /usr/local/apache2/conf/httpd.conf</code> 打开 Apache 配置文件，按下 <code>i</code> 键开始编辑。</p>
+<ol>
+<li><p>找到 <em>ServerName</em> 参数，添加 <code>ServerName localhost:80</code>。</p>
+<p><img src="7.png"></p>
+</li>
+<li><p>找到 <code>Directory</code> 参数，在 <code>Require all denied</code> 前面添加 <code>#</code>，然后添加 <code>Require all granted</code>。</p>
+<p><img src="8.png"></p>
+</li>
+<li><p>找到 <code>DirectoryIndex index.html</code>，将它替换为 <code>DirectoryIndex index.php index.html</code>。</p>
+<p><img src="9.png"></p>
+</li>
+<li><p>找到如下内容：</p>
+<p><img src="10.png"></p>
+<p>在后面添加内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">AddType application/x-httpd-php .php</span><br><span class="line">AddType application/x-httpd-php-source .phps</span><br></pre></td></tr></table></figure>
+
+<p>添加完成后，如下图所示。</p>
+<p><img src="11.png"></p>
+</li>
+<li><p>按下 <code>Esc</code> 键，然后输入 <code>:wq</code> 并回车以保存并关闭Apache 配置文件。</p>
+</li>
+</ol>
+</li>
+<li><p>添加 Apache 对解析 PHP 的支持。</p>
+<ol>
+<li><p>运行命令打开 index.php 文件。</p>
+</li>
+<li><p>按下 <code>i</code> 键进入编辑模式，并添加如下内容:</p>
+</li>
+<li><p>按下 <code>Esc</code> 键，然后输入 <code>:wq</code> 并回车以保存并关闭 index.php 文件。</p>
+</li>
+<li><p>运行以下命令重启 Apache 服务。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart httpd</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><p>在本地机器的浏览器地址栏中，输入 <code>https://IP地址</code> 并按下 <code>Enter</code> 键。如果返回页面如下图所示，说明 PHP 解析成功。</p>
+<p><img src="12.png"></p>
+</li>
+</ol>
+<h2 id="安装-phpMyAdmin"><a href="#安装-phpMyAdmin" class="headerlink" title="安装 phpMyAdmin"></a>安装 phpMyAdmin</h2><ol>
+<li><p>依次运行以下命令准备 phpMyAdmin 数据存放目录。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /usr/local/apache2/htdocs/phpmyadmin</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>依次运行以下命令下载 phpMyAdmin 压缩包并解压。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://files.phpmyadmin.net/phpMyAdmin/4.0.10.20/phpMyAdmin-4.0.10.20-all-languages.zip</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unzip phpMyAdmin-4.0.10.20-all-languages.zip</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行以下命令复制 phpMyAdmin 文件到准备好的数据存放目录。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mv phpMyAdmin-4.0.10.20-all-languages/*  /usr/local/apache2/htdocs/phpmyadmin</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在本地机器浏览器地址栏，输入 <code>http://IP地址/phpmyadmin</code> 并按 <code>Enter</code> 键，访问 phpMyAdmin 登录界面。</p>
+<p><img src="13.png"></p>
+</li>
+<li><p>输入 MySQL 的用户名和密码，单击 <strong>执行</strong>。</p>
+<p><img src="14.png"></p>
+<p>如果出现以下页面，说明 MySQL 连接成功。</p>
+<p><img src="15.png"></p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div></div>
+  <button onclick="document.querySelector('.post-reward').classList.toggle('active');">
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="Dawn 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.png" alt="Dawn 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Dawn
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://poundba.github.io/build-LAMP-environment/" title="部署 LAMP 环境">https://poundba.github.io/build-LAMP-environment/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          
+
+  <div class="followme">
+    <span>欢迎关注我的其它发布渠道</span>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/images/wechat_channel.jpg">
+            <span class="icon">
+              <i class="fab fa-weixin"></i>
+            </span>
+
+            <span class="label">WeChat</span>
+          </a>
+        </div>
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+          <div class="post-tags">
+              <a href="/tags/LAMP/" rel="tag"><i class="fa fa-tag"></i> LAMP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/build-SSR-nodes/" rel="prev" title="搭建 SSR 节点">
+                  <i class="fa fa-chevron-left"></i> 搭建 SSR 节点
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/build-LNMP-environment/" rel="next" title="部署 LNMP 环境">
+                  部署 LNMP 环境 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+  
+  
+  
+
+
+
+      
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Dawn</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">108k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:38</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.0/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/@next-theme/pjax@0.4.0/pjax.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '.page-configurations',
+    '.main-inner',
+    '.post-toc-wrap',
+    '.languages',
+    '.pjax'
+  ],
+  analytics: false,
+  cacheBust: false,
+  scrollRestoration: false,
+  scrollTo: !CONFIG.bookmark.enable
+});
+
+document.addEventListener('pjax:success', () => {
+  pjax.executeScripts(document.querySelectorAll('script[data-pjax], .pjax script'));
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  const hasTOC = document.querySelector('.post-toc');
+  document.querySelector('.sidebar-inner').classList.toggle('sidebar-nav-active', hasTOC);
+  document.querySelector(hasTOC ? '.sidebar-nav-toc' : '.sidebar-nav-overview').click();
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+
+
+    <div class="pjax">
+  
+
+  
+<script>
+NexT.utils.loadComments('#valine-comments', () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    new Valine(Object.assign({
+      el  : '#valine-comments',
+      path: "/build-LAMP-environment/",
+    }, {"enable":"enable","appId":"zMJzllPjiLVMHNfCdUSaRQoL-gzGzoHsz","appKey":"HqdO9y0e4xjwf27iLI44Yl6b","placeholder":"Just go go","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"lang":"zh-cn","visitor":false,"comment_count":true,"recordIP":true,"serverURLs":null,"enableQQ":true,"requiredFields":[]}
+    ));
+  }, window.Valine);
+});
+</script>
+
+    </div>
+</body>
+</html>
